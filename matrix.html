@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Matrix Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            color: #00ff00;
+            font-family: monospace;
+            position: relative;
+        }
+        canvas {
+            display: block;
+        }
+        #welcome-sign {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            opacity: 1;
+        }
+        @keyframes colorTransition {
+            0% { color: white; }
+            25% { color: #d3d3d3; }
+            50% { color: #a9a9a9; }
+            75% { color: #696969; }
+            100% { color: black; }
+        }
+        @keyframes dropIn {
+            0% { transform: translateY(-150%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .letter {
+            display: inline-block;
+            animation: dropIn 10s ease forwards, colorTransition 30s infinite;
+            text-shadow: 0 0 5px #ff4500, 0 0 10px #ff8c00, 0 0 20px #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-sign"></div>
+    <canvas id="matrix"></canvas>
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        const welcomeSign = document.getElementById('welcome-sign');
+        const welcomeText = "WELCOME TO THE MATRIX";
+
+        // Create individual letter elements for the welcome sign
+        welcomeText.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.className = 'letter';
+            span.style.animationDelay = `${index * 0.2}s`;
+            welcomeSign.appendChild(span);
+        });
+
+        // Set the canvas to be full screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = `${fontSize}px monospace`;
+
+            drops.forEach((y, index) => {
+                const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                const x = index * fontSize;
+
+                ctx.fillText(text, x, y * fontSize);
+
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[index] = 0;
+                }
+
+                drops[index]++;
+            });
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
